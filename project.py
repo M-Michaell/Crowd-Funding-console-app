@@ -1,7 +1,7 @@
 import user
 import datetime
 import re
-
+from os import system
 class Project:
     def __init__(self, email, title, details, target, start_date, end_date):
         self.email = email
@@ -62,8 +62,13 @@ class General:
                 General.main_operation(email, db_manager)
                 break
             elif answer == "2":
-                new_project=General.project_data(email, db_manager)
+                system("clear")
+                print("""
+                        creating project
+                        """)
+                new_project=General.project_data(email)
                 if db_manager.insert_project(new_project):
+                    system("clear")
                     print("Project creation successful!")
                 else:
                     print("Project creation failed. Please try again.")
@@ -76,6 +81,8 @@ class General:
                 break
             elif answer == "4":
                 break
+
+
             else:
                 print("Wrong answer! Try again")
 
@@ -136,7 +143,7 @@ class General:
 
             # data get from user when create project 
     @staticmethod
-    def project_data(email, db_manager):
+    def project_data(email):
         title = input("Enter project Title: ")
         details = input("Enter project details: ")
         while True:
@@ -183,12 +190,13 @@ class General:
                 Press (1) to edit title
                 Press (2) to edit details
                 Press (3) to edit target
-                Press (4) to go back to the previous menu
+                press (4) to edit end_date
+                Press (5) to go back to the previous menu
                 """)
             answer = input("Enter your answer: ")
             if answer == "1":
                 edit_title = input("Enter the new project title: ")
-                db_manager.edit_project(email, title, "title", edit_title)
+            
             elif answer == "2":
                 edit_detail = input("Enter the new project detail: ")
                 db_manager.edit_project(email, title, "details", edit_detail)
@@ -201,7 +209,16 @@ class General:
                         break
                     except ValueError:
                         print("Please enter a valid target, try again")
-            elif answer == "4":
+            elif answer =='4' :
+                while True :
+                    end_date=input("Enter the end date: ")
+                    edit_end_date = db_manager.edit_project(email, title, "end_date", end_date)
+                    if edit_end_date:
+                        break
+
+
+
+            elif answer == "5":
                 break
 
                     # to show others project data

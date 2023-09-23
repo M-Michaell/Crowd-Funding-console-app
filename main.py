@@ -1,5 +1,6 @@
 import user
 import project
+from os import system
 
 def main():
     db_manager = user.DatabaseManager("project.db")
@@ -23,6 +24,7 @@ def main():
         elif answer == "2":
             new_user = user.Authentication.register_user()
             if db_manager.insert_user(new_user):
+                system("clear")
                 print("Registration successful!")
             else:
                 print("Registration failed. Please try again.")
@@ -37,4 +39,3 @@ if __name__ == "__main__":
 
 # already exsist users 
 # email : m@m.com    pass :Mm@18101998
-# email : n@n.com    pass :Mm@18101998

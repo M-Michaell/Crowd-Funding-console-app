@@ -1,5 +1,7 @@
 import sqlite3 as sql
 import logging
+import datetime
+import project
 
 class DatabaseManager:
     def __init__(self, db_name):
@@ -45,7 +47,7 @@ class DatabaseManager:
     def create_project_table(self):
         with sql.connect(self.db_name) as db:
             cursor = db.cursor()
-            cursor.execute("CREATE TABLE IF NOT EXISTS project (email TEXT, title TEXT, details TEXT, start_date DATE, end_date DATE, FOREIGN KEY (email) REFERENCES users(email), PRIMARY KEY (email, title))")
+            cursor.execute("CREATE TABLE IF NOT EXISTS project (email TEXT, title TEXT, details TEXT,target intger,start_date DATE, end_date DATE, FOREIGN KEY (email) REFERENCES users(email), PRIMARY KEY (email, title))")
             db.commit()
 
     def user_projects(self, email):
@@ -93,7 +95,27 @@ class DatabaseManager:
             return []
 
     def edit_project(self, email, title, thing, new_value):
+
+        if thing =="end_date" :
+            start_date= DatabaseManager.user_project_details(self,email,title)[4]
+            start_date=str(start_date)
+            while True :
+                if thing =="end_date" :
+                    if project.General.valid_date(new_value):
+                        if datetime.datetime.strptime(new_value, "%d/%m/%Y") < datetime.datetime.strptime(start_date, "%d/%m/%Y"):
+                            print(f"you must enter a date which come after start_date: {start_date}")
+                            return False
+                        else:
+                            break
+                    else :
+                        print("not a valid date , you must enter a date in format: dd/mm/yyyy")
+                        return False
+                else :
+                    break
+                
+                
         try:
+
             with sql.connect(self.db_name) as db:
                 cursor = db.cursor()
                 cursor.execute(f"UPDATE project SET {thing}=? WHERE title=? AND email=?", (new_value, title, email))
@@ -110,6 +132,7 @@ class DatabaseManager:
                 cursor = db.cursor()
                 cursor.execute("DELETE FROM project WHERE email=? AND title=?", (email, title))
                 db.commit()
+                print("Successfully deleted")
                 return True
         except Exception as e:
             logging.error(f"Error deleting project: {str(e)}")

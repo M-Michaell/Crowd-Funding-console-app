@@ -4,6 +4,8 @@ import logging
 from os import system
 import sqlite3 as sql
 from database import DatabaseManager
+import hashlib
+from os import system
 
 class User:
     def __init__(self, first_name, last_name, email, password, mobile_phone):
@@ -43,9 +45,8 @@ class Authentication:
     @staticmethod
     def create_password():
         valid_password = Authentication.valid_password()
-        confirming = getpass("Retype your password: ")
-        Authentication.confirm_password(valid_password, confirming)
-        return valid_password
+        Authentication.confirm_password(valid_password)
+        return hashlib.sha256(valid_password.encode()).hexdigest()
 
     @staticmethod
     def valid_password():
@@ -66,8 +67,9 @@ class Authentication:
         return password
 
     @staticmethod
-    def confirm_password(password, confirm_password):
+    def confirm_password(password):
         while True:
+            confirm_password=getpass("Please retype your password: ")
             if confirm_password == password:
                 return
             else:
@@ -75,7 +77,6 @@ class Authentication:
                 while True:
                     reply = input("Press C to confirm it again or press R to reset it: ").lower()
                     if reply == "c":
-                        confirm_password = getpass("Retype your password: ")
                         break
                     elif reply == "r":
                         password = Authentication.create_password()
@@ -91,7 +92,7 @@ class Authentication:
         last_name = input("Please enter your last name: ")
         last_name = Authentication.valid_name(last_name)
 
-        email = input("Please enter your email: ")
+        email = input("Please enter your email: ").strip().lower()
         email = Authentication.valid_email(email)
 
         password = Authentication.create_password()
@@ -103,7 +104,7 @@ class Authentication:
 
     @staticmethod
     def login_user(db_manager):
-        email = input("Please enter your email address: ")
+        email = input("Please enter your email address: ").strip().lower()
 
         try:
             with sql.connect(db_manager.db_name) as db:
@@ -113,10 +114,13 @@ class Authentication:
                 while True:
                     if user:
                         input_password = getpass("Please enter your password: ")
+                        password=hashlib.sha256(input_password.encode()).hexdigest()
                         stored_password = user[3]
 
-                        if input_password == stored_password:
+                        if password == stored_password:
+                            system("clear")
                             print("Login successful!")
+                            print(f"\t Welcome back {user[0]}")
                             return email
                         else:
                             print("Incorrect password. Please try again.")
