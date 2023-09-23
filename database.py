@@ -3,6 +3,7 @@ import logging
 import datetime
 import project
 
+logging.basicConfig(filename='error.log', level=logging.ERROR)
 class DatabaseManager:
     def __init__(self, db_name):
         self.db_name = db_name
