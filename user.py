@@ -7,6 +7,7 @@ from database import DatabaseManager
 import hashlib
 from os import system
 
+logging.basicConfig(filename='error.log', level=logging.ERROR)
 class User:
     def __init__(self, first_name, last_name, email, password, mobile_phone):
         self.first_name = first_name
